@@ -54,12 +54,15 @@ class World:
     def Simulate(self, t):
         for i in range(self.step):
             for particle in self.particles:
-                particle.Accelerate(Vector(cos(t), self.gravity.y))
+                particle.Accelerate(self.gravity)
                 particle.Simulate()
                 particle.Restrain()
                 particle.ResetForces()
             for constraint in self.constraints:
                 constraint.Relax()
+
+            self.particles[49].ApplyForce(Vector(10*cos(12*t), 0))
+
 
 
 
