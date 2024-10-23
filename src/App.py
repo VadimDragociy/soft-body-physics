@@ -17,7 +17,7 @@ class App:
     center    = (0, 0)                          # application window position
     flags     = game.HWSURFACE | game.DOUBLEBUF # hardware acceleration and double buffering
     framerate = 30                              # application frame rate
-
+    t = 0  # время с начала симуляции
 
     # Class constructor. Initialize the Pygame window with a title, position, and frame rate.
     #
@@ -51,6 +51,7 @@ class App:
         while self.running:
             for event in game.event.get():
                 self.HandleEvent(event)
+            self.t += 1/30
             self.Update()
             self.Render()
             game.time.delay(int(1000 / self.framerate))

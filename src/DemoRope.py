@@ -1,3 +1,5 @@
+from cmath import cos, sin
+
 import pygame as game
 
 from App import *
@@ -6,41 +8,27 @@ from VerletPhysics import *
 
 class DemoRope(App):
     #
-    world    = World(Vector(640.0, 480.0), Vector(0, 2), 4)
+    world = World(Vector(1000.0, 900.0), Vector(0, 2), 4)
     #
-    grabbed  = None
-    radius   = 20
+    grabbed = None
+    radius = 20
     strength = 0.20
-
 
     #
     def Initialize(self):
-        #
         rope = self.world.AddComposite()
-        rope.AddParticles(
-            self.world.AddParticle(self.world.hsize.x, 50.0),
-            self.world.AddParticle(self.world.hsize.x, 90.0),
-            self.world.AddParticle(self.world.hsize.x, 130.0),
-            self.world.AddParticle(self.world.hsize.x, 170.0),
-            self.world.AddParticle(self.world.hsize.x, 210.0),
-            self.world.AddParticle(self.world.hsize.x, 250.0),
-            self.world.AddParticle(self.world.hsize.x, 290.0),
-            self.world.AddParticle(self.world.hsize.x, 330.0),
-            self.world.AddParticle(self.world.hsize.x, 370.0),
-            self.world.AddParticle(self.world.hsize.x, 410.0))
-        rope.AddConstraints(
-            self.world.AddConstraint(rope.particles[0], rope.particles[1], 1.0),
-            self.world.AddConstraint(rope.particles[1], rope.particles[2], 1.0),
-            self.world.AddConstraint(rope.particles[2], rope.particles[3], 1.0),
-            self.world.AddConstraint(rope.particles[3], rope.particles[4], 1.0),
-            self.world.AddConstraint(rope.particles[4], rope.particles[5], 1.0),
-            self.world.AddConstraint(rope.particles[5], rope.particles[6], 1.0),
-            self.world.AddConstraint(rope.particles[6], rope.particles[7], 1.0),
-            self.world.AddConstraint(rope.particles[7], rope.particles[8], 1.0),
-            self.world.AddConstraint(rope.particles[8], rope.particles[9], 1.0))
+        particles = list()
+        j = 0
+        for i in range(0, 50):
+            particles.append(self.world.AddParticle(self.world.hsize.x, 10.0 + j))
+            j += 15
+        rope.AddParticles(*particles)
+        constraints = list()
+        for i in range(0, 49):
+            constraints.append(self.world.AddConstraint(rope.particles[i], rope.particles[i+1], 1.0))
+        rope.AddConstraints(*constraints)
         rope.particles[0].material.mass = 0.0
-        rope.particles[9].ApplyForce(Vector(400.0, -900.0))
-
+        rope.particles[49].ApplyForce(Vector(-cos(self.world.delta), 0))
 
     #
     def Update(self):
@@ -53,14 +41,14 @@ class DemoRope(App):
             if self.grabbed != None:
                 mouse = Vector(game.mouse.get_pos()[0], game.mouse.get_pos()[1])
                 force = (mouse - self.grabbed.position) * self.strength
+                print(force)
                 self.grabbed.ApplyImpulse(force)
         else:
             self.grabbed = None
         #
         if game.key.get_pressed()[game.K_ESCAPE]:
             self.Exit()
-        self.world.Simulate()
-
+        self.world.Simulate(self.t)
 
     #
     def Render(self):
@@ -69,28 +57,24 @@ class DemoRope(App):
         for c in self.world.constraints:
             pos1 = (int(c.node1.position.x), int(c.node1.position.y))
             pos2 = (int(c.node2.position.x), int(c.node2.position.y))
-            game.draw.line(self.screen, (255, 0, 0), pos1, pos2, 4)
+            game.draw.line(self.screen, (0, 255, 0), pos1, pos2, 3)
         for p in self.world.particles:
             pos = (int(p.position.x), int(p.position.y))
-            game.draw.circle(self.screen, (255, 255, 255), pos, 8, 0)
+            game.draw.circle(self.screen, (255, 255, 255), pos, 5, 0)
         game.display.update()
 
-
-    #
     def ClosestPoint(self):
-        mouse    = Vector(game.mouse.get_pos()[0], game.mouse.get_pos()[1])
-        closest  = None
+        mouse = Vector(game.mouse.get_pos()[0], game.mouse.get_pos()[1])
+        closest = None
         distance = float('inf')
         for particle in self.world.particles:
             d = mouse.distance(particle.position)
             if d < distance:
-                closest  = particle
+                closest = particle
                 distance = d
         return (closest, distance)
 
 
 if __name__ == "__main__":
-    print( "Starting...")
-    app = DemoRope("Swinging Rope", 640, 480, 30)
+    app = DemoRope("Application", 1000, 900, 30)
     app.Run()
-    print( "Ending...")

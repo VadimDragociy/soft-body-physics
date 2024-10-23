@@ -3,7 +3,7 @@
 # A simulation space for our soft-body physics simulation. All simulated objects need a place to do
 # so, and this world can be used to define global constants within the simulation (such as gravity
 # and simulation time steps), as well as manage all of the simulated objects in a single place.
-
+from math import cos
 
 from Vector import *
 from Particle import *
@@ -51,10 +51,10 @@ class World:
     # @param    null
     # @return   null
     #
-    def Simulate(self):
+    def Simulate(self, t):
         for i in range(self.step):
             for particle in self.particles:
-                particle.Accelerate(self.gravity)
+                particle.Accelerate(Vector(cos(t), self.gravity.y))
                 particle.Simulate()
                 particle.Restrain()
                 particle.ResetForces()
