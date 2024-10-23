@@ -29,6 +29,7 @@ class DemoRope(App):
         rope.AddConstraints(*constraints)
         rope.particles[0].material.mass = 0.0
  #       rope.particles[49].ApplyForce(Vector(-cos(self.world.delta), 0))
+ #       rope.particles[49].ApplyForce(Vector(-cos(self.world.delta), 0))
 
     #
     def Update(self):
@@ -76,5 +77,6 @@ class DemoRope(App):
 
 
 if __name__ == "__main__":
+    app = DemoRope("Application", 1000, 900, 60)
     app = DemoRope("Application", 1000, 900, 60)
     app.Run()

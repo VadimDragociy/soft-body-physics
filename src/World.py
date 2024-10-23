@@ -55,6 +55,7 @@ class World:
         for i in range(self.step):
             for particle in self.particles:
                 particle.Accelerate(self.gravity)
+                particle.Accelerate(self.gravity)
                 particle.Simulate()
                 particle.Restrain()
                 particle.ResetForces()
