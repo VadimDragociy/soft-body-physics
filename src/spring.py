@@ -5,10 +5,11 @@ from VerletPhysics import *
 
 count = 50
 initial_length = 30  # Здесь задается длина пружины
-stiffness_value = 0.25  # Здесь задается жесткость пружины
+global stiffness_value  # Здесь задается жесткость пружины
+stiffness_value = 1
 
 class DemoRope(App):
-    world = World(Vector(1000.0, 2500.0), Vector(0, 2), 4)
+    world = World(Vector(3000.0, 5000.0), Vector(0, 2), 4)
     grabbed = None
     radius = 20
     strength = 0.20
@@ -38,7 +39,7 @@ class DemoRope(App):
             particle = self.world.AddParticle(self.world.hsize.x, 10.0 + j)
             particle.velocity = Vector(0, 0)
             particles.append(particle)
-            j += 15
+            j += 50
         rope.AddParticles(*particles)
 
         # Fix the top particle, set up the bottom as oscillating

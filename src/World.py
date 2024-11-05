@@ -39,7 +39,7 @@ class World:
                 particle.ResetForces()
             for constraint in self.constraints:
                 constraint.Relax()
-            self.particles[99].ApplyForce(Vector(10 * cos(12 * t), 0))
+            # self.particles[99].ApplyForce(Vector(10 * cos(12 * t), 0))
 
     def AddParticle(self, x, y, mat=None):
         particle = Particle(self, x, y, mat)
