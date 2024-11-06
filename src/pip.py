@@ -9,7 +9,7 @@ global stiffness_value  # Здесь задается жесткость пру�
 stiffness_value = 1
 
 class DemoRope(App):
-    world = World(Vector(3000.0, 5000.0), Vector(0, 2), 4)
+    world = World(Vector(10000, 5000.0), Vector(0, 2), 4)
     grabbed = None
     radius = 20
     strength = 0.20
@@ -18,9 +18,10 @@ class DemoRope(App):
     oscillation_mode = None  # 'x' for horizontal, 'y' for vertical
     oscillating_particle = None
     oscillating_particle_1 = None
-    oscillation_amplitude_x = 100  # Small amplitude for x-axis
+    oscillating_particle_2 = None
+    oscillation_amplitude_x = 200  # Small amplitude for x-axis
     oscillation_amplitude_y = 2  # Smaller amplitude for y-axis
-    oscillation_frequency_x = 6  # Frequency of oscillation
+    oscillation_frequency_x = 10  # Frequency of oscillation
     oscillation_frequency_y = 10
     spatial_time = 0.1  # Задержка между колебаниями
     time_since_last_oscillation_x = 0
@@ -46,8 +47,9 @@ class DemoRope(App):
         # Fix the top particle, set up the bottom as oscillating
         rope.particles[0].material.mass = 0.0
         rope.particles[-1].material.mass = 0.0
-        self.oscillating_particle = rope.particles[-3]
-        self.oscillating_particle_1 = rope.particles[2]
+        self.oscillating_particle = rope.particles[-1]
+        self.oscillating_particle_1 = rope.particles[0]
+        # self.oscillating_particle_2 = rope.particles[-25]
 
 
         # Gradually adjust bottom particle to position all particles just above it
@@ -82,15 +84,15 @@ class DemoRope(App):
 
         if self.recording:
             dt = self.t
-            for i in self.y_displacements.keys():
-                particle = self.world.particles[i]
-                displacement = particle.position.y - self.initial_y_positions[i]
-                self.y_displacements[i].append(displacement)
-                # Скорость продольной волны по изменению смещения
-                speed = (displacement - self.prev_y_displacements[i]) / dt
-                self.y_speeds[i].append(speed)
-                # Обновляем предыдущее смещение
-                self.prev_y_displacements[i] = displacement
+            # for i in self.y_displacements.keys():
+            #     particle = self.world.particles[i]
+            #     displacement = particle.position.y - self.initial_y_positions[i]
+            #     self.y_displacements[i].append(displacement)
+            #     # Скорость продольной волны по изменению смещения
+            #     speed = (displacement - self.prev_y_displacements[i]) / dt
+            #     self.y_speeds[i].append(speed)
+            #     # Обновляем предыдущее смещение
+            #     self.prev_y_displacements[i] = displacement
             for i in self.x_displacements.keys():
                 particle = self.world.particles[i]
                 displacement = particle.position.x - self.initial_x_positions[i]
@@ -112,24 +114,30 @@ class DemoRope(App):
 
         if keys[game.K_x]:
             self.oscillation_mode = 'x'
+            self.StartGraphRecording()  # Start recording y-displacements
         elif keys[game.K_y]:
             self.oscillation_mode = 'y'
-            self.StartGraphRecording()  # Start recording y-displacements
+            # self.StartGraphRecording()  # Start recording y-displacements
         elif keys[game.K_1] and self.oscillation_mode == 'x':
             self.oscillation_mode = None  # Stop horizontal oscillation
         elif keys[game.K_2] and self.oscillation_mode == 'y':
             self.oscillation_mode = None  # Stop vertical oscillation
 
-        center_x = (self.world.particles[0].position.x + self.oscillating_particle.position.x) / 2
-        center_x_1 = (self.world.particles[0].position.x + self.oscillating_particle_1.position.x) / 2
+        # center_x = (self.world.particles[0].position.x + self.oscillating_particle.position.x) / 2
+        center_x = self.world.hsize.x
+        # center_x_1 = (self.world.particles[0].position.x + self.oscillating_particle_1.position.x) / 2
+        center_x_1 = self.world.hsize.x
+        # center_x_2 = (self.world.particles[0].position.x + self.oscillating_particle_2.position.x) / 2
         if self.oscillation_mode == 'x':
             self.time_since_last_oscillation_x += time_elapsed
             if self.time_since_last_oscillation_x >= self.spatial_time:
                 new_x = center_x + self.oscillation_amplitude_x * sin(self.oscillation_frequency_x * time_elapsed).real
-                # new_x_1 = center_x_1 + self.oscillation_amplitude_x * (-1)*sin(self.oscillation_frequency_x * time_elapsed).real
-                new_x_1 = center_x_1 + self.oscillation_amplitude_x * sin(self.oscillation_frequency_x * time_elapsed).real
+                new_x_1 = center_x_1 + self.oscillation_amplitude_x * (-1) *sin(self.oscillation_frequency_x * time_elapsed).real
+                # new_x_1 = center_x_1 + self.oscillation_amplitude_x * sin(self.oscillation_frequency_x * time_elapsed).real
+                # new_x_2 = center_x_2 + self.oscillation_amplitude_x *(-1)* sin(self.oscillation_frequency_x * time_elapsed).real
                 self.oscillating_particle.position.x = new_x
                 self.oscillating_particle_1.position.x = new_x_1
+                # self.oscillating_particle_2.position.x = new_x_2
                 self.time_since_last_oscillation_x = 0
             
 
@@ -218,12 +226,12 @@ class DemoRope(App):
 
     def StartGraphRecording(self):
         # Инициализировать начальные позиции для отслеживания смещений
-        self.y_displacements = {i: [] for i in range(0, len(self.world.particles)-11, 3)}
-        self.initial_y_positions = {i: self.world.particles[i].position.y for i in self.y_displacements.keys()}
-        self.prev_y_displacements = {i: self.initial_y_positions[i] for i in self.y_displacements.keys()}
-        self.y_speeds = {i: [] for i in self.y_displacements.keys()}  # Словарь для записи скоростей
+        # self.y_displacements = {i: [] for i in range(0, len(self.world.particles)-11, 1)}
+        # self.initial_y_positions = {i: self.world.particles[i].position.y for i in self.y_displacements.keys()}
+        # self.prev_y_displacements = {i: self.initial_y_positions[i] for i in self.y_displacements.keys()}
+        # self.y_speeds = {i: [] for i in self.y_displacements.keys()}  # Словарь для записи скоростей
 
-        self.x_displacements = {i: [] for i in range(0, len(self.world.particles)-11, 3)}
+        self.x_displacements = {i: [] for i in range(0, len(self.world.particles)-11, 1)}
         self.initial_x_positions = {i: self.world.particles[i].position.x for i in self.x_displacements.keys()}
         self.prev_x_displacements = {i: self.initial_x_positions[i] for i in self.x_displacements.keys()}
         self.x_speeds = {i: [] for i in self.x_displacements.keys()}  # Словарь для записи скоростей
@@ -235,11 +243,12 @@ class DemoRope(App):
         self.recording = False  # Отключаем флаг записи
 
         # Построение графиков смещения и скорости
-        fig, axs = plt.subplots(2, 1, figsize=(3, 8))
+        fig, axs = plt.subplots(2, 1, figsize=(10, 8))
 
         # График смещения
         for i, displacements in self.x_displacements.items():
-            axs[0].plot(displacements, label=f"Particle {i}")
+            if i > 23 and i < 27:
+                axs[0].plot([abs(x) for x in displacements], label=f"Particle {i}")
         axs[0].set_xlabel("Time")
         axs[0].set_ylabel("X Displacement from Initial Position")
         axs[0].legend()
