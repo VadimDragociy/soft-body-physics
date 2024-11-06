@@ -9,7 +9,7 @@ global stiffness_value  # Здесь задается жесткость пру�
 stiffness_value = 1
 
 class DemoRope(App):
-    world = World(Vector(10000, 5000.0), Vector(0, 2), 4)
+    world = World(Vector(10000.0, 10000.0), Vector(0, 1), 4)
     grabbed = None
     radius = 20
     strength = 0.20
@@ -54,7 +54,7 @@ class DemoRope(App):
 
         # Gradually adjust bottom particle to position all particles just above it
         for i, particle in enumerate(particles[1:], start=1):
-            initial_length = (particles[1].position.y - particles[0].position.y) * 1.05
+            initial_length = (particles[1].position.y - particles[0].position.y) * 1
             particle.position.y = particles[0].position.y + initial_length * i
 
         # Add constraints with reduced stiffness
@@ -132,7 +132,7 @@ class DemoRope(App):
             self.time_since_last_oscillation_x += time_elapsed
             if self.time_since_last_oscillation_x >= self.spatial_time:
                 new_x = center_x + self.oscillation_amplitude_x * sin(self.oscillation_frequency_x * time_elapsed).real
-                new_x_1 = center_x_1 + self.oscillation_amplitude_x * (-1) *sin(self.oscillation_frequency_x * time_elapsed).real
+                new_x_1 = center_x_1 + self.oscillation_amplitude_x * sin(self.oscillation_frequency_x * time_elapsed - math.pi/2).real
                 # new_x_1 = center_x_1 + self.oscillation_amplitude_x * sin(self.oscillation_frequency_x * time_elapsed).real
                 # new_x_2 = center_x_2 + self.oscillation_amplitude_x *(-1)* sin(self.oscillation_frequency_x * time_elapsed).real
                 self.oscillating_particle.position.x = new_x
